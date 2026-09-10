@@ -120,7 +120,43 @@ const loginAdmin = async (req, res) => {
   }
 };
 
+const logoutAdmin = async (req, res) => {
+  try {
+    res.cookie("token", "", {
+      httpOnly: true,
+      expires: new Date(0),
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Logout successful",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getAdminProfile = async (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      admin: req.admin,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 module.exports = {
   registerAdmin,
   loginAdmin,
+  logoutAdmin,
+  getAdminProfile
 };
