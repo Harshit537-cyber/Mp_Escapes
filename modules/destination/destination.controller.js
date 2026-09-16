@@ -257,3 +257,20 @@ exports.deleteDestination = async (req, res) => {
     });
   }
 };
+
+exports.getAllDestinationNames = async (req, res) => {
+  try {
+    const destinations = await Destination.find().select("name").sort({ name: 1 });
+
+    return res.status(200).json({
+      success: true,
+      count: destinations.length,
+      data: destinations,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

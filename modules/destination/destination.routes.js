@@ -16,6 +16,7 @@ router.put(
 );
 
 router.get("/", destinationController.getAllDestinations);
+router.get("/names", destinationController.getAllDestinationNames);
 router.get("/:id", destinationController.getDestinationById);
 router.delete("/:id", destinationController.deleteDestination);
 
