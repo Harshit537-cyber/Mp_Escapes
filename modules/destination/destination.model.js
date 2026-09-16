@@ -21,6 +21,10 @@ const destinationSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    mapImage: {
+      type: String,
+      default: "",
+    },
     description: {
       type: String,
       required: true,

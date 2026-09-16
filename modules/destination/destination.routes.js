@@ -3,17 +3,13 @@ const router = express.Router();
 const { upload } = require("../../middlewares/upload.middleware");
 const destinationController = require("./destination.controller");
 
-router.post(
-  "/",
-  upload.array("images", 5),
-  destinationController.createDestination
-);
+const uploadFields = upload.fields([
+  { name: "images", maxCount: 5 },
+  { name: "mapImage", maxCount: 1 },
+]);
 
-router.put(
-  "/:id",
-  upload.array("images", 5),
-  destinationController.updateDestination
-);
+router.post("/", uploadFields, destinationController.createDestination);
+router.put("/:id", uploadFields, destinationController.updateDestination);
 
 router.get("/", destinationController.getAllDestinations);
 router.get("/names", destinationController.getAllDestinationNames);

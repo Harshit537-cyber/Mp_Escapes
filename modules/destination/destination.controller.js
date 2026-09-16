@@ -40,14 +40,25 @@ exports.createDestination = async (req, res) => {
     const parsedTravelInfo = parseField(essentialTravelInfo) || {};
 
     let imageUrls = [];
+    let mapImageUrl = "";
 
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const uploadResult = await uploadBufferToCloudinary(
-          file.buffer,
-          "destinations"
+    if (req.files) {
+      if (req.files.images && req.files.images.length > 0) {
+        for (const file of req.files.images) {
+          const uploadResult = await uploadBufferToCloudinary(
+            file.buffer,
+            "destinations"
+          );
+          imageUrls.push(uploadResult.secure_url);
+        }
+      }
+
+      if (req.files.mapImage && req.files.mapImage.length > 0) {
+        const mapUploadResult = await uploadBufferToCloudinary(
+          req.files.mapImage[0].buffer,
+          "destinations/maps"
         );
-        imageUrls.push(uploadResult.secure_url);
+        mapImageUrl = mapUploadResult.secure_url;
       }
     }
 
@@ -56,6 +67,7 @@ exports.createDestination = async (req, res) => {
       tagline,
       description,
       images: imageUrls,
+      mapImage: mapImageUrl,
       highlights: Array.isArray(parsedHighlights)
         ? parsedHighlights
         : [parsedHighlights],
@@ -113,17 +125,29 @@ exports.updateDestination = async (req, res) => {
       updatedImages = Array.isArray(parsedExistingImages)
         ? parsedExistingImages
         : [parsedExistingImages];
-    } else if (!req.files || req.files.length === 0) {
+    } else if (!req.files || !req.files.images) {
       updatedImages = existingDestination.images;
     }
 
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const uploadResult = await uploadBufferToCloudinary(
-          file.buffer,
-          "destinations"
+    const updateData = {};
+
+    if (req.files) {
+      if (req.files.images && req.files.images.length > 0) {
+        for (const file of req.files.images) {
+          const uploadResult = await uploadBufferToCloudinary(
+            file.buffer,
+            "destinations"
+          );
+          updatedImages.push(uploadResult.secure_url);
+        }
+      }
+
+      if (req.files.mapImage && req.files.mapImage.length > 0) {
+        const mapUploadResult = await uploadBufferToCloudinary(
+          req.files.mapImage[0].buffer,
+          "destinations/maps"
         );
-        updatedImages.push(uploadResult.secure_url);
+        updateData.mapImage = mapUploadResult.secure_url;
       }
     }
 
@@ -133,8 +157,6 @@ exports.updateDestination = async (req, res) => {
         message: "Maximum 5 images are allowed",
       });
     }
-
-    const updateData = {};
 
     if (name) updateData.name = name;
     if (tagline) updateData.tagline = tagline;
@@ -210,6 +232,23 @@ exports.getAllDestinations = async (req, res) => {
   }
 };
 
+exports.getAllDestinationNames = async (req, res) => {
+  try {
+    const destinations = await Destination.find().select("name").sort({ name: 1 });
+
+    return res.status(200).json({
+      success: true,
+      count: destinations.length,
+      data: destinations,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 exports.getDestinationById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -249,23 +288,6 @@ exports.deleteDestination = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Destination deleted successfully",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-exports.getAllDestinationNames = async (req, res) => {
-  try {
-    const destinations = await Destination.find().select("name").sort({ name: 1 });
-
-    return res.status(200).json({
-      success: true,
-      count: destinations.length,
-      data: destinations,
     });
   } catch (error) {
     return res.status(500).json({
