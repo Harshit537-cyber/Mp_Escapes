@@ -9,6 +9,12 @@ router.post(
   destinationController.createDestination
 );
 
+router.put(
+  "/:id",
+  upload.array("images", 5),
+  destinationController.updateDestination
+);
+
 router.get("/", destinationController.getAllDestinations);
 router.get("/:id", destinationController.getDestinationById);
 router.delete("/:id", destinationController.deleteDestination);

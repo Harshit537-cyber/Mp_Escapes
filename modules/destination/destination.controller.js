@@ -85,6 +85,114 @@ exports.createDestination = async (req, res) => {
   }
 };
 
+exports.updateDestination = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const existingDestination = await Destination.findById(id);
+
+    if (!existingDestination) {
+      return res.status(404).json({
+        success: false,
+        message: "Destination not found",
+      });
+    }
+
+    const {
+      name,
+      tagline,
+      description,
+      highlights,
+      essentialTravelInfo,
+      existingImages,
+    } = req.body;
+
+    let updatedImages = [];
+
+    if (existingImages) {
+      const parsedExistingImages = parseField(existingImages);
+      updatedImages = Array.isArray(parsedExistingImages)
+        ? parsedExistingImages
+        : [parsedExistingImages];
+    } else if (!req.files || req.files.length === 0) {
+      updatedImages = existingDestination.images;
+    }
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploadResult = await uploadBufferToCloudinary(
+          file.buffer,
+          "destinations"
+        );
+        updatedImages.push(uploadResult.secure_url);
+      }
+    }
+
+    if (updatedImages.length > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Maximum 5 images are allowed",
+      });
+    }
+
+    const updateData = {};
+
+    if (name) updateData.name = name;
+    if (tagline) updateData.tagline = tagline;
+    if (description) updateData.description = description;
+
+    if (highlights) {
+      const parsedHighlights = parseField(highlights);
+      updateData.highlights = Array.isArray(parsedHighlights)
+        ? parsedHighlights
+        : [parsedHighlights];
+    }
+
+    if (essentialTravelInfo) {
+      const parsedTravelInfo = parseField(essentialTravelInfo);
+      updateData.essentialTravelInfo = {
+        weatherAndSeasonality:
+          parsedTravelInfo.weatherAndSeasonality ||
+          existingDestination.essentialTravelInfo.weatherAndSeasonality,
+        nearestAirport:
+          parsedTravelInfo.nearestAirport ||
+          existingDestination.essentialTravelInfo.nearestAirport,
+        nearestRailhead:
+          parsedTravelInfo.nearestRailhead ||
+          existingDestination.essentialTravelInfo.nearestRailhead,
+        roadConnectivity:
+          parsedTravelInfo.roadConnectivity ||
+          existingDestination.essentialTravelInfo.roadConnectivity,
+        canBeCombinedWith: parsedTravelInfo.canBeCombinedWith
+          ? Array.isArray(parsedTravelInfo.canBeCombinedWith)
+            ? parsedTravelInfo.canBeCombinedWith
+            : [parsedTravelInfo.canBeCombinedWith]
+          : existingDestination.essentialTravelInfo.canBeCombinedWith,
+      };
+    }
+
+    if (updatedImages.length > 0) {
+      updateData.images = updatedImages;
+    }
+
+    const updatedDestination = await Destination.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Destination updated successfully",
+      data: updatedDestination,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 exports.getAllDestinations = async (req, res) => {
   try {
     const destinations = await Destination.find().sort({ createdAt: -1 });
