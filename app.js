@@ -6,6 +6,7 @@ const adminRoutes = require("./modules/admin/admin.routes");
 const userRoutes = require("./modules/user/user.routes");
 const categoryRoutes = require("./modules/category/category.routes");
 const destinationRoutes = require("./modules/destination/destination.routes");
+const downloadRoutes = require("./modules/download/download.routes");
 
 const app = express();
 
@@ -25,5 +26,6 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/destinations", destinationRoutes);
+app.use("/api/downloads", downloadRoutes);
 
 module.exports = app;
