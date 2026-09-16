@@ -18,7 +18,7 @@ const upload = multer({
       return cb(null, true);
     }
 
-    cb(new Error("Only images (jpeg, jpg, png, webp, gif) are allowed"));
+    cb(new Error("Only images are allowed"));
   },
 });
 
@@ -45,4 +45,59 @@ const uploadToCloudinary = (req, res, next) => {
   uploadStream.end(req.file.buffer);
 };
 
-module.exports = { upload, uploadToCloudinary };
+const uploadCategoryImages = async (req, res, next) => {
+  try {
+    if (!req.files) return next();
+
+    const uploadStreamPromise = (buffer, folder) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder },
+          (error, result) => {
+            if (error) {
+              console.error("Cloudinary Error Details:", error);
+              return reject(error);
+            }
+            resolve(result);
+          }
+        );
+        stream.end(buffer);
+      });
+    };
+
+    if (req.files.image && req.files.image[0]) {
+      const result = await uploadStreamPromise(
+        req.files.image[0].buffer,
+        "categories"
+      );
+      req.mainImage = {
+        url: result.secure_url,
+        publicId: result.public_id,
+      };
+    }
+
+    if (req.files.fallbackImage && req.files.fallbackImage[0]) {
+      const result = await uploadStreamPromise(
+        req.files.fallbackImage[0].buffer,
+        "categories/fallbacks"
+      );
+      req.fallbackImage = {
+        url: result.secure_url,
+        publicId: result.public_id,
+      };
+    }
+
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Image upload failed",
+    });
+  }
+};
+
+module.exports = { 
+  upload, 
+  uploadToCloudinary, 
+  uploadCategoryImages 
+};

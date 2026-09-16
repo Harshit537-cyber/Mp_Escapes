@@ -45,7 +45,7 @@ const registerAdmin = async (req, res) => {
         id: admin._id,
         name: admin.name,
         email: admin.email,
-        avatar: admin.avatar.url,
+        avatar: admin.avatar?.url || "",
       },
     });
   } catch (error) {
@@ -91,7 +91,7 @@ const loginAdmin = async (req, res) => {
       process.env.JWT_SECRET,
       {
         expiresIn: "1d",
-      }
+      },
     );
 
     const cookieOptions = {
@@ -101,17 +101,20 @@ const loginAdmin = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     };
 
-    res.cookie("token", token, cookieOptions).status(200).json({
-      success: true,
-      message: "Login successful",
-      token,
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        avatar: admin.avatar?.url || "",
-      },
-    });
+    res
+      .cookie("token", token, cookieOptions)
+      .status(200)
+      .json({
+        success: true,
+        message: "Login successful",
+        token,
+        admin: {
+          id: admin._id,
+          name: admin.name,
+          email: admin.email,
+          avatar: admin.avatar?.url || "",
+        },
+      });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -141,6 +144,68 @@ const logoutAdmin = async (req, res) => {
   }
 };
 
+const exchangeToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: "🔐 Token is Required",
+      });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const admin = await Admin.findById(decode.id).select("-password");
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "Token is required",
+      });
+    }
+
+    const newToken = jwt.sign(
+      {
+        id: admin._id,
+        email: admin.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      },
+    );
+
+
+    const cookieOptions = {
+      httpOnly:true,
+      secure:process.env.NODE_ENV = "production",
+      sameSite:"strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    }
+
+
+   res.cookie("token", newToken, cookieOptions).status(200).json({
+     success: true,
+      message: "Token exchanged successfully",
+      token: newToken,
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        avatar: admin.avatar?.url || "",
+      },
+   })
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "🚨 Internal Server Error 😵‍💫",
+    });
+  }
+};
+
 const getAdminProfile = async (req, res) => {
   try {
     res.status(200).json({
@@ -154,9 +219,11 @@ const getAdminProfile = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   registerAdmin,
   loginAdmin,
   logoutAdmin,
-  getAdminProfile
+  getAdminProfile,
+  exchangeToken
 };
