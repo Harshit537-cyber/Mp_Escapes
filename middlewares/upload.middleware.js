@@ -4,9 +4,10 @@ const cloudinary = require("../config/cloudinary");
 
 const storage = multer.memoryStorage();
 
+// 1. Images ke liye (Purana wala)
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
   fileFilter: (req, file, cb) => {
     const allowedExtensions = /jpeg|jpg|png|webp|gif|svg/;
     const extname = allowedExtensions.test(
@@ -19,6 +20,25 @@ const upload = multer({
     }
 
     cb(new Error("Only images are allowed"));
+  },
+});
+
+// 2. 👇 Videos ke liye naya upload middleware
+const uploadVideo = multer({
+  storage,
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedExtensions = /mp4|mkv|mov|avi|webm/;
+    const extname = allowedExtensions.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+    const isVideoMime = file.mimetype.startsWith("video/");
+
+    if (extname || isVideoMime) {
+      return cb(null, true);
+    }
+
+    cb(new Error("Only video files (mp4, mov, avi, mkv, webm) are allowed!"));
   },
 });
 
@@ -98,6 +118,7 @@ const uploadCategoryImages = async (req, res, next) => {
 
 module.exports = { 
   upload, 
+  uploadVideo, // 👈 Export kiya
   uploadToCloudinary, 
   uploadCategoryImages 
 };
