@@ -6,6 +6,10 @@ const hotelController = require("./hotel.controller");
 router.post("/", upload.array("images", 4), hotelController.createHotel);
 router.put("/:id", upload.array("images", 4), hotelController.updateHotel);
 router.get("/", hotelController.getAllHotels);
+
+// 👇 `/:id` se pehle lagaya hai taaki "names" ko ID na samjhe
+router.get("/names", hotelController.getAllHotelNames);
+
 router.get("/:id", hotelController.getHotelById);
 router.delete("/:id", hotelController.deleteHotel);
 

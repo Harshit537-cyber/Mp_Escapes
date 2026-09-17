@@ -98,6 +98,24 @@ exports.getAllHotels = async (req, res) => {
   }
 };
 
+// 👇 Nayi API: Sirf hotel names aur IDs fetch karne ke liye
+exports.getAllHotelNames = async (req, res) => {
+  try {
+    const hotels = await Hotel.find().select("name").sort({ name: 1 });
+
+    return res.status(200).json({
+      success: true,
+      count: hotels.length,
+      data: hotels,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 exports.getHotelById = async (req, res) => {
   try {
     const { id } = req.params;
