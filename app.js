@@ -9,6 +9,7 @@ const destinationRoutes = require("./modules/destination/destination.routes");
 const downloadRoutes = require("./modules/download/download.routes");
 const imageBankRoutes = require("./modules/image-bank/imageBank.routes");
 const hotelRoutes = require("./modules/hotel/hotel.routes");
+const mapRoutes = require("./modules/map/map.routes"); // 👈 1. Map route import kiya
 
 const app = express();
 
@@ -31,5 +32,6 @@ app.use("/api/destinations", destinationRoutes);
 app.use("/api/downloads", downloadRoutes);
 app.use("/api/image-bank", imageBankRoutes);
 app.use("/api/hotels", hotelRoutes);
+app.use("/api/maps", mapRoutes); 
 
 module.exports = app;
