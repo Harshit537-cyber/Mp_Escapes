@@ -8,6 +8,8 @@ const uploadFields = upload.fields([
   { name: "mapImage", maxCount: 1 },
 ]);
 
+
+router.get("/summary", destinationController.getDestinationsSummary);
 router.post("/", uploadFields, destinationController.createDestination);
 router.put("/:id", uploadFields, destinationController.updateDestination);
 
@@ -15,5 +17,7 @@ router.get("/", destinationController.getAllDestinations);
 router.get("/names", destinationController.getAllDestinationNames);
 router.get("/:id", destinationController.getDestinationById);
 router.delete("/:id", destinationController.deleteDestination);
+
+
 
 module.exports = router;
