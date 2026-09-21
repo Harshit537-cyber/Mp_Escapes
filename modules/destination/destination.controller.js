@@ -299,7 +299,7 @@ exports.deleteDestination = async (req, res) => {
 
 exports.getDestinationsSummary = async (req, res) => {
   try {
-    // .select() se sirf required fields aayengi (baaki heavy fields like travelInfo, mapImage skip ho jayengi)
+ 
     const destinations = await Destination.find()
       .select("name tagline description images")
       .sort({ createdAt: -1 });

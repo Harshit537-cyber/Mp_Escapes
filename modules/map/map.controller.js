@@ -1,7 +1,7 @@
 const Map = require("./map.model");
 const cloudinary = require("../../config/cloudinary");
 
-// Cloudinary upload helper
+
 const uploadBufferToCloudinary = (buffer, folder) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -15,7 +15,7 @@ const uploadBufferToCloudinary = (buffer, folder) => {
   });
 };
 
-// 1. Create / Add New City Map
+
 exports.createMap = async (req, res) => {
   try {
     const { cityName } = req.body;
@@ -34,7 +34,7 @@ exports.createMap = async (req, res) => {
       });
     }
 
-    // Upload to Cloudinary folder 'city_maps'
+   
     const uploadResult = await uploadBufferToCloudinary(
       req.file.buffer,
       "city_maps"
@@ -58,7 +58,7 @@ exports.createMap = async (req, res) => {
   }
 };
 
-// 2. Get All City Maps (Sare city names aur map images)
+
 exports.getAllMaps = async (req, res) => {
   try {
     const maps = await Map.find().sort({ cityName: 1 });
@@ -76,7 +76,7 @@ exports.getAllMaps = async (req, res) => {
   }
 };
 
-// 3. Get Single Map By ID
+
 exports.getMapById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -101,7 +101,7 @@ exports.getMapById = async (req, res) => {
   }
 };
 
-// 4. Update Map (City Name ya Map Image change karne ke liye)
+
 exports.updateMap = async (req, res) => {
   try {
     const { id } = req.params;
@@ -118,7 +118,7 @@ exports.updateMap = async (req, res) => {
     const updateData = {};
     if (cityName) updateData.cityName = cityName;
 
-    // Agar nayi image upload ki hai
+   
     if (req.file) {
       const uploadResult = await uploadBufferToCloudinary(
         req.file.buffer,
@@ -146,7 +146,7 @@ exports.updateMap = async (req, res) => {
   }
 };
 
-// 5. Delete Map
+
 exports.deleteMap = async (req, res) => {
   try {
     const { id } = req.params;

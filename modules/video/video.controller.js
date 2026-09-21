@@ -1,14 +1,14 @@
 const Video = require("./video.model");
 const cloudinary = require("../../config/cloudinary");
 
-// Cloudinary Video Upload Helper (resource_type: "video" zaroori hota hai)
+
 const uploadVideoBufferToCloudinary = (buffer, folder) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder,
         resource_type: "video",
-        chunk_size: 6000000, // Large video chunks handle karne ke liye
+        chunk_size: 6000000, 
       },
       (error, result) => {
         if (error) return reject(error);
@@ -19,7 +19,7 @@ const uploadVideoBufferToCloudinary = (buffer, folder) => {
   });
 };
 
-// 1. Video Upload Karna (City Name + Video Name ke sath)
+
 exports.createVideo = async (req, res) => {
   try {
     const { cityName, videoName } = req.body;
