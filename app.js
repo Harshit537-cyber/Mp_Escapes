@@ -10,8 +10,9 @@ const downloadRoutes = require("./modules/download/download.routes");
 const imageBankRoutes = require("./modules/image-bank/imageBank.routes");
 const hotelRoutes = require("./modules/hotel/hotel.routes");
 const mapRoutes = require("./modules/map/map.routes");
-const videoRoutes = require("./modules/video/video.routes"); 
+const videoRoutes = require("./modules/video/video.routes");
 const dosDontsRoutes = require("./modules/dos-donts/dosDonts.routes");
+const guidelinesRoutes = require("./modules/guidelines/guidelines.routes");
 
 const app = express();
 
@@ -35,7 +36,8 @@ app.use("/api/downloads", downloadRoutes);
 app.use("/api/image-bank", imageBankRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/maps", mapRoutes);
-app.use("/api/videos", videoRoutes); // 👈 2. Video route mount kiya
+app.use("/api/videos", videoRoutes);
 app.use("/api/dos-donts", dosDontsRoutes);
+app.use("/api/guidelines", guidelinesRoutes);
 
 module.exports = app;

@@ -3,7 +3,7 @@ const cloudinary = require("../../config/cloudinary");
 const archiver = require("archiver");
 const axios = require("axios");
 
-// Archiver instance helper
+
 const getArchiveInstance = (options) => {
   if (typeof archiver === "function") {
     return archiver("zip", options);
@@ -17,12 +17,12 @@ const getArchiveInstance = (options) => {
   throw new Error("Unable to initialize archiver");
 };
 
-// Cloudinary raw/document upload helper
+
 const uploadBufferToCloudinaryRaw = (buffer, originalName) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
-        resource_type: "raw", // PDF, DOC, DOCX ke liye 'raw' best rehta hai
+        resource_type: "raw", 
         folder: "dos-donts-docs",
         use_filename: true,
         filename_override: originalName,
@@ -36,7 +36,7 @@ const uploadBufferToCloudinaryRaw = (buffer, originalName) => {
   });
 };
 
-// 1. Upload Docs / Create Dos & Don'ts Entry
+
 exports.createDosDonts = async (req, res) => {
   try {
     const { title, description } = req.body;
@@ -85,7 +85,7 @@ exports.createDosDonts = async (req, res) => {
   }
 };
 
-// 2. Get All Dos & Don'ts list
+
 exports.getAllDosDonts = async (req, res) => {
   try {
     const list = await DosDonts.find().sort({ createdAt: -1 });
@@ -103,7 +103,7 @@ exports.getAllDosDonts = async (req, res) => {
   }
 };
 
-// 3. Get Single Dos & Don'ts by ID
+
 exports.getDosDontsById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -128,7 +128,7 @@ exports.getDosDontsById = async (req, res) => {
   }
 };
 
-// 4. Download Single File Directly (Frontend download ke liye)
+
 exports.downloadSingleFile = async (req, res) => {
   try {
     const { id, fileId } = req.params;
@@ -143,7 +143,7 @@ exports.downloadSingleFile = async (req, res) => {
       return res.status(404).json({ success: false, message: "File nahi mili" });
     }
 
-    // Stream download directly to client
+   
     const response = await axios.get(targetFile.fileUrl, {
       responseType: "stream",
     });
@@ -163,7 +163,7 @@ exports.downloadSingleFile = async (req, res) => {
   }
 };
 
-// 5. Download All Files in a Category as ZIP
+
 exports.downloadDosDontsZip = async (req, res) => {
   try {
     const { id } = req.params;
@@ -202,7 +202,6 @@ exports.downloadDosDontsZip = async (req, res) => {
   }
 };
 
-// 6. Delete Dos & Don'ts
 exports.deleteDosDonts = async (req, res) => {
   try {
     const { id } = req.params;
