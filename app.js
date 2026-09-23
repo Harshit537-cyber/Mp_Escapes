@@ -13,7 +13,7 @@ const mapRoutes = require("./modules/map/map.routes");
 const videoRoutes = require("./modules/video/video.routes");
 const dosDontsRoutes = require("./modules/dos-donts/dosDonts.routes");
 const guidelinesRoutes = require("./modules/guidelines/guidelines.routes");
-
+const qrRoutes = require("./modules/qr/qr.routes");
 const app = express();
 
 app.use(cors({ origin: true, credentials: true }));
@@ -39,5 +39,6 @@ app.use("/api/maps", mapRoutes);
 app.use("/api/videos", videoRoutes);
 app.use("/api/dos-donts", dosDontsRoutes);
 app.use("/api/guidelines", guidelinesRoutes);
+app.use("/api/qr", qrRoutes);
 
 module.exports = app;
